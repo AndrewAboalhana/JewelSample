@@ -5,20 +5,25 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.android.application)
     id("maven-publish")
+    id("convention.publication")
 }
 
+group = "io.github.AndrewAboAlhana"
+version = "Beta-0.0.1"
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
     androidTarget {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "17"
+                jvmTarget = "11"
             }
         }
     }
 
-    jvm("desktop")
+    jvm("desktop") {
+        jvmToolchain(11)
+    }
 
     js {
         browser()
@@ -125,3 +130,25 @@ compose.desktop {
 compose.experimental {
     web.application {}
 }
+
+tasks.named("publishDesktopPublicationToSonatypeRepository") {
+    dependsOn(":composeApp:signKotlinMultiplatformPublication")
+}
+
+tasks.named("publishDesktopPublicationToSonatypeRepository") {
+    dependsOn(":composeApp:signJsPublication")
+}
+
+tasks.named("publishJsPublicationToSonatypeRepository") {
+    dependsOn(":composeApp:signKotlinMultiplatformPublication")
+    dependsOn(":composeApp:signDesktopPublication")
+}
+
+tasks.named("publishKotlinMultiplatformPublicationToSonatypeRepository") {
+    dependsOn(":composeApp:signJsPublication")
+    dependsOn(":composeApp:signDesktopPublication")
+}
+
+
+
+
